@@ -54,6 +54,15 @@ export default function ResultScreen() {
   ];
   const [modalVisible, setModalVisible] = useState(false);
   const [newPlaylistName, setNewPlaylistName] = useState('');
+  const [allocations, setAllocations] = useState([
+    { label: 'Album 1', value: 'album-1' },
+    { label: 'Scatola Rara', value: 'scatola-rara' },
+  ]);
+
+  const [selectedAllocations, setSelectedAllocations] = useState<string[]>([]);
+  const [allocOpen, setAllocOpen] = useState(false);
+  const [allocModalVisible, setAllocModalVisible] = useState(false);
+  const [newAllocationName, setNewAllocationName] = useState('');
 
   const handleAddToCollection = () => {
     const carteDaAggiungere = condizioni.map(cond => ({
@@ -66,14 +75,14 @@ export default function ResultScreen() {
       inGoat: inGoatBool,
       inEdison: inEdisonBool,
       cardmarket_scrap_price: cardmarket_scrap_price,
+      allocazioni: selectedAllocations, // 👈 aggiunto qui
+      playlist: selectedPlaylists,      // 👈 anche questo utile
     }));
-
-    // Esempio: invio al backend
-    // await fetch('/api/add', { method: 'POST', body: JSON.stringify(carteDaAggiungere) })
 
     setAdded(true);
     Alert.alert('Successo', 'Carte aggiunte alla collezione!');
   };
+
 
   const handleQuantitaChange = (text: string) => {
     setQuantita(text); // aggiorna il campo input
@@ -129,6 +138,7 @@ export default function ResultScreen() {
             </Picker>
           </View>
         ))}
+
         <Text style={styles.label}>Playlist di destinazione:</Text>
         <View style={styles.playlistRow}>
           <View style={{ flex: 1, zIndex: open ? 1000 : 1 }}>
@@ -153,6 +163,36 @@ export default function ResultScreen() {
 
           <Pressable
             onPress={() => setModalVisible(true)}
+            style={styles.inlineAdd}
+          >
+            <Text style={styles.inlineAddText}>➕</Text>
+          </Pressable>
+        </View>
+
+        <Text style={styles.label}>Allocazione fisica:</Text>
+        <View style={styles.playlistRow}>
+          <View style={{ flex: 1, zIndex: allocOpen ? 2000 : 1 }}>
+            <DropDownPicker
+              listMode="SCROLLVIEW"
+              multiple={true}
+              open={allocOpen}
+              value={selectedAllocations}
+              items={allocations}
+              setOpen={setAllocOpen}
+              setValue={setSelectedAllocations}
+              setItems={setAllocations}
+              searchable={true}
+              placeholder="Seleziona una o più allocazioni"
+              style={styles.dropdown}
+              dropDownContainerStyle={{
+                zIndex: 2000,
+                elevation: 2000, // Android
+              }}
+            />
+          </View>
+
+          <Pressable
+            onPress={() => setAllocModalVisible(true)}
             style={styles.inlineAdd}
           >
             <Text style={styles.inlineAddText}>➕</Text>
@@ -196,6 +236,42 @@ export default function ResultScreen() {
                   setSelectedPlaylists(prev => [...prev, value]);
                   setNewPlaylistName('');
                   setModalVisible(false);
+                }}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={allocModalVisible}
+        onRequestClose={() => setAllocModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.label}>Nome nuova allocazione:</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Es. Album 3"
+              value={newAllocationName}
+              onChangeText={setNewAllocationName}
+            />
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+              <Button title="Annulla" onPress={() => setAllocModalVisible(false)} />
+              <Button
+                title="Crea"
+                onPress={() => {
+                  if (newAllocationName.trim() === '') return;
+
+                  const value = newAllocationName.trim().toLowerCase().replace(/\s+/g, '-');
+                  const label = newAllocationName.trim();
+
+                  setAllocations(prev => [...prev, { label, value }]);
+                  setSelectedAllocations(prev => [...prev, value]);
+                  setNewAllocationName('');
+                  setAllocModalVisible(false);
                 }}
               />
             </View>
