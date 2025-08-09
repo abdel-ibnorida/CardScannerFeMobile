@@ -1,13 +1,12 @@
 
-
 import { Slot } from 'expo-router';
 import React from 'react';
-import { PhotoProvider } from '../context/PhotoContext'; // metti path corretto
+import { AuthProvider } from '../context/AuthContext';
 
 export default function RootLayout() {
   return (
-    <PhotoProvider>
+    <AuthProvider>
       <Slot />
-    </PhotoProvider>
+    </AuthProvider>
   );
 }

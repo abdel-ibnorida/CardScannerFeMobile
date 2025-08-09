@@ -29,6 +29,10 @@ export default function TabsLayout() {
         name="archivio"
         options={{ title: 'Archivio' }}
       />
+      <Tabs.Screen 
+        name="profile" 
+        options={{ title: 'Profile' }}
+      />
     </Tabs>
   );
 }
